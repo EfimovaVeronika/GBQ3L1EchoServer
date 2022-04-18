@@ -58,7 +58,8 @@ public class Client {
 
         while (channel.isConnectionPending()) {
             channel.finishConnect();
-            channel.register(selectionKey.selector(), SelectionKey.OP_WRITE);
+            // как это работает? в какой момент клиент блокируется потоком с клавиатуры?
+            channel.register(selectionKey.selector(), SelectionKey.OP_WRITE | SelectionKey.OP_READ);
         }
     }
 
@@ -71,10 +72,6 @@ public class Client {
         String message = userInputReader.readLine();
         ByteBuffer byteBuffer = ByteBuffer.wrap(message.getBytes());
         socketChannel.write(byteBuffer);
-
-        if (message.equals("\\n")) {
-            socketChannel.register(selectionKey.selector(), SelectionKey.OP_READ);
-        }
     }
 
     public static void processRead(SelectionKey selectionKey) throws IOException {
@@ -87,7 +84,5 @@ public class Client {
 
             System.out.println("Echo: " + message);
         }
-
-        socketChannel.register(selectionKey.selector(), SelectionKey.OP_WRITE);
     }
 }
